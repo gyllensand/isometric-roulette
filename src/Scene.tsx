@@ -1,6 +1,13 @@
 import { Environment, OrbitControls } from "@react-three/drei";
 import { extend, useThree } from "@react-three/fiber";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { RoundedBoxGeometry } from "three-stdlib/geometries/RoundedBoxGeometry";
 import { EffectComposer, SSAO } from "@react-three/postprocessing";
 import { start } from "tone";
@@ -11,8 +18,8 @@ import {
   pickRandomDecimalFromInterval,
   pickRandomHash,
 } from "./utils";
-import { BG_COLORS, COLORS } from "./constants";
-import { ROW_X, ROW_Y, ROW_Z } from "./App";
+import { BG_COLORS, COLORS, INSTRUMENTS } from "./constants";
+import { ROW_X, ROW_Y, ROW_Z, Sample, AUDIO } from "./App";
 const perlinNoise3d = require("perlin-noise-3d");
 
 // @ts-ignore
@@ -33,14 +40,12 @@ const perlinNoise3d = require("perlin-noise-3d");
 
 extend({ RoundedBoxGeometry });
 
+export const instrument = pickRandomHash(INSTRUMENTS);
 export const envMapIntensity = pickRandomDecimalFromInterval(0.5, 1);
-export const roughMetalness = pickRandomDecimalFromInterval(0, 0.2);
 const ambientLight = pickRandomDecimalFromInterval(0, 0.5);
 const bgColor = pickRandomHash(BG_COLORS);
 const primaryColor = pickRandomHash(COLORS);
 const secondaryColor = pickRandomHash(COLORS);
-
-console.log(bgColor, primaryColor);
 const noise = new perlinNoise3d();
 const p3 =
   (time: number, threshold: number) => (a: number, b: number, c: number) =>
@@ -56,6 +61,15 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
     aspect: state.viewport.aspect,
     clock: state.clock,
   }));
+  const [lastPlayedSample, setLastPlayedSample] = useState<Sample>();
+
+  const availableChords = useMemo(
+    () =>
+      AUDIO[instrument].filter(
+        ({ sampler, index }) => index !== lastPlayedSample?.index
+      ),
+    [lastPlayedSample]
+  );
 
   const updateCubes = useCallback(
     (count: number): [number, number[][]] => {
@@ -97,6 +111,12 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
     set(data);
   }, [updateCubes]);
 
+  useEffect(() => {
+    if (lastPlayedSample && lastPlayedSample.sampler.loaded) {
+      lastPlayedSample.sampler.triggerAttack("C#-1");
+    }
+  }, [lastPlayedSample]);
+
   const onPointerDown = useCallback(async () => {
     if (!toneInitialized.current) {
       await start();
@@ -108,14 +128,13 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
 
     set(data);
 
-    // if (AUDIO.state !== "started" && AUDIO.loaded) {
-    //   AUDIO.start();
-    // }
-  }, [updateCubes, iterationCount]);
+    const currentSampler = pickRandomHash(availableChords);
+    setLastPlayedSample(currentSampler);
+  }, [updateCubes, iterationCount, availableChords]);
 
-  // useEffect(() => {
-  //   AUDIO.toDestination();
-  // }, []);
+  useEffect(() => {
+    AUDIO[instrument].forEach(({ sampler }) => sampler.toDestination());
+  }, []);
 
   useEffect(() => {
     const ref = canvasRef?.current;

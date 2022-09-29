@@ -1,3 +1,5 @@
+export const INSTRUMENTS = [0, 1];
+
 export const BG_COLORS = [
   "white",
   "#e0feff",

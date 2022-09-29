@@ -10,7 +10,7 @@ import {
 } from "three";
 import { ROW_X, ROW_Y, ROW_Z, TOTAL } from "./App";
 import { COLORS } from "./constants";
-import { envMapIntensity, roughMetalness} from "./Scene";
+import { envMapIntensity} from "./Scene";
 import { pickRandomColorWithTheme } from "./utils";
 
 const Cubes = ({
@@ -104,8 +104,8 @@ const Cubes = ({
           // @ts-ignore */}
         </roundedBoxGeometry>
         <meshStandardMaterial
-          roughness={roughMetalness}
-          metalness={roughMetalness}
+          roughness={0}
+          metalness={0}
           vertexColors
           envMapIntensity={envMapIntensity}
         />
