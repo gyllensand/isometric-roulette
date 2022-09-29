@@ -8,9 +8,8 @@ import {
   Vector3,
   MathUtils,
 } from "three";
-import { ROW_X, ROW_Y, ROW_Z, TOTAL } from "./App";
 import { COLORS } from "./constants";
-import { envMapIntensity} from "./Scene";
+import { envMapIntensity, ROW_X, ROW_Y, ROW_Z, TOTAL } from "./Scene";
 import { pickRandomColorWithTheme } from "./utils";
 
 const Cubes = ({

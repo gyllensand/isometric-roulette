@@ -1,4 +1,4 @@
-export const INSTRUMENTS = [0, 1];
+export const INSTRUMENTS = [0, 1, 2];
 
 export const BG_COLORS = [
   "white",

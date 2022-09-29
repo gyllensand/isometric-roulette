@@ -17,35 +17,39 @@ import {
   getSizeByAspect,
   pickRandomDecimalFromInterval,
   pickRandomHash,
+  pickRandomIntFromInterval,
 } from "./utils";
 import { BG_COLORS, COLORS, INSTRUMENTS } from "./constants";
-import { ROW_X, ROW_Y, ROW_Z, Sample, AUDIO } from "./App";
-const perlinNoise3d = require("perlin-noise-3d");
+import { Sample, AUDIO } from "./App";
 
-// @ts-ignore
-// window.$fxhashFeatures = {
-//   earthType: earthTypeNames[earthType],
-//   primaryTexture,
-//   colorTheme,
-//   sunTheme,
-//   bgTheme,
-//   cloudTheme: clouds,
-//   ambientLightIntensity,
-//   particlesCount: particles,
-//   shapeComposition: layers.reduce(
-//     (total, value) => (total += value.composition),
-//     0
-//   ),
-// };
+const perlinNoise3d = require("perlin-noise-3d");
 
 extend({ RoundedBoxGeometry });
 
+export const ROW_X = pickRandomIntFromInterval(4, 7);
+export const ROW_Y = pickRandomIntFromInterval(4, 7);
+export const ROW_Z = pickRandomIntFromInterval(4, 7);
+export const TOTAL = ROW_X * ROW_Y * ROW_Z;
+
 export const instrument = pickRandomHash(INSTRUMENTS);
+const internalInstrument = instrument === 0 || instrument === 1 ? 0 : 1;
 export const envMapIntensity = pickRandomDecimalFromInterval(0.5, 1);
 const ambientLight = pickRandomDecimalFromInterval(0, 0.5);
 const bgColor = pickRandomHash(BG_COLORS);
 const primaryColor = pickRandomHash(COLORS);
 const secondaryColor = pickRandomHash(COLORS);
+
+// @ts-ignore
+window.$fxhashFeatures = {
+  instrument,
+  xRowCount: ROW_X,
+  yRowCount: ROW_Y,
+  zRowCount: ROW_Z,
+  bgColor,
+  primaryColor,
+  secondaryColor,
+};
+
 const noise = new perlinNoise3d();
 const p3 =
   (time: number, threshold: number) => (a: number, b: number, c: number) =>
@@ -62,11 +66,10 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
     clock: state.clock,
   }));
   const [lastPlayedSample, setLastPlayedSample] = useState<Sample>();
-
   const availableChords = useMemo(
     () =>
-      AUDIO[instrument].filter(
-        ({ sampler, index }) => index !== lastPlayedSample?.index
+      AUDIO[internalInstrument].filter(
+        ({ index }) => index !== lastPlayedSample?.index
       ),
     [lastPlayedSample]
   );
@@ -113,7 +116,9 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
 
   useEffect(() => {
     if (lastPlayedSample && lastPlayedSample.sampler.loaded) {
-      lastPlayedSample.sampler.triggerAttack("C#-1");
+      lastPlayedSample.sampler.triggerAttack(
+        instrument === 1 ? "G#-1" : "C#-1"
+      );
     }
   }, [lastPlayedSample]);
 
@@ -133,7 +138,7 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
   }, [updateCubes, iterationCount, availableChords]);
 
   useEffect(() => {
-    AUDIO[instrument].forEach(({ sampler }) => sampler.toDestination());
+    AUDIO[internalInstrument].forEach(({ sampler }) => sampler.toDestination());
   }, []);
 
   useEffect(() => {
