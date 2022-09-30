@@ -6,7 +6,9 @@ export const BG_COLORS = [
   "#FCEEB5",
   "#fff6d1",
   "#ffce00",
+  "#c91414",
   "#eb3434",
+  "#f76464",
   "#d8ffdd",
   "#30f8a0",
   "lightpink",
@@ -18,6 +20,7 @@ export const BG_COLORS = [
   "#497fff",
   "#005eb8",
   "#344df2",
+  "#ff48e6",
   "#dc0fc0",
 ];
 
@@ -44,6 +47,7 @@ export const COLORS = [
   "#497fff",
   "#005eb8",
   "#344df2",
+  "#ff48e6",
   "#dc0fc0",
   "#75007e",
   "#aa4807",
