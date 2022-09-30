@@ -165,7 +165,7 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
       <ambientLight intensity={ambientLight} />
       <pointLight position={[-10, 0, 0]} intensity={3} />
       <pointLight position={[10, 10, 10]} intensity={2} castShadow />
-      <Environment preset="studio" />
+      <Environment files={`${process.env.PUBLIC_URL}/studio_small_03_1k.hdr`} />
       <EffectComposer multisampling={0}>
         <SSAO
           samples={31}
