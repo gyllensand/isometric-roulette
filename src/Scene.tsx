@@ -51,6 +51,7 @@ window.$fxhashFeatures = {
 };
 
 const noise = new perlinNoise3d();
+noise.noiseSeed(getRandomNumber());
 const p3 =
   (time: number, threshold: number) => (a: number, b: number, c: number) =>
     noise.get(
@@ -80,9 +81,11 @@ const Scene = ({ canvasRef }: { canvasRef: RefObject<HTMLCanvasElement> }) => {
 
       while (visible[0] && visible[0].filter((o) => o === 1).length < 15) {
         visible = [[], []];
+        const timeInit =
+          count === 0 ? getRandomNumber() : clock.getElapsedTime();
 
         for (let i = 0; i < 2; i++) {
-          const time = clock.getElapsedTime() * (1 + 60 * getRandomNumber());
+          const time = timeInit * (1 + 60 * getRandomNumber());
           const threshold = 0.05 + 0.05 * getRandomNumber();
 
           for (let z = -ROW_Z / 2; z < ROW_Z / 2; z += 1) {
