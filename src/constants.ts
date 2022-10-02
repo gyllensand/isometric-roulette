@@ -11,6 +11,7 @@ export const BG_COLORS = [
   "#f76464",
   "#d8ffdd",
   "#30f8a0",
+  "#77dd77",
   "lightpink",
   "#f97b9c",
   "#EE786E",
