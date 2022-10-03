@@ -237,7 +237,7 @@ const App = () => {
       ref={canvasRef}
       shadows
       orthographic
-      dpr={window.devicePixelRatio}
+      dpr={[2, 2]}
       camera={{ position: [0, 0, 10], near: 1, far: 15, zoom }}
     >
       <Suspense fallback={null}>
